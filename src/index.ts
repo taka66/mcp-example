@@ -28,9 +28,12 @@ server.tool(
   "テスト用の文字列データを取得する",
   {},
   async () => {
-    const resp = await fetch("http://localhost:3000/test");
-    const body = await resp.text();
-    return { content: [{ type: "text", text: body }] };
+    const foo = process.env.FOO ?? "";
+    return { content: [{ type: "text", text: foo }] };
+    // NEED TO RUN LOCAL SERVER
+    // const resp = await fetch("http://localhost:3000/test");
+    // const body = await resp.text();
+    // return { content: [{ type: "text", text: body }] };
   }
 );
 
@@ -173,6 +176,33 @@ server.tool(
         {
           type: "text",
           text: forecastText,
+        },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "roll_dice",
+  "指定された回数だけサイコロを振り、合計値を返す",
+  { rolls: z.number().min(1).describe("サイコロを振る回数") },
+  ({ rolls }) => {
+    let total = 0;
+    const results = [];
+
+    for (let i = 0; i < rolls; i++) {
+      const roll = Math.floor(Math.random() * 6) + 1;
+      total += roll;
+      results.push(roll);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `${rolls}回振った結果:\n各目: [${results.join(
+            ", "
+          )}]\n合計: ${total}`,
         },
       ],
     };
